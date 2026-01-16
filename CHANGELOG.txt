@@ -1,6 +1,19 @@
 https://www.curseforge.com/wow/addons/gladiatorlossa2
 https://github.com/Rhykes/GladiatorlosSA2
 ===========================================
+- version 5.0+ (TBC Anniversary Compatibility)
+
+Compatibility
+- Added support for Anniversary TBC (2.5.5) Retail-based UI client.
+- Replaced deprecated global Blizzard API calls with compatible wrappers.
+- Fixed addon metadata access for Retail UI environment.
+- Ensured options initialization works correctly under hybrid client.
+- No gameplay, spell, or alert logic changes.
+
+Notes
+- This is a compatibility-only port.
+- Original alert logic, spell lists, and sounds are unchanged.
+===========================================
 - version 5.0 (The War Within)
 
 General
