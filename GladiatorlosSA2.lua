@@ -1,38 +1,55 @@
-﻿ GladiatorlosSA = LibStub("AceAddon-3.0"):NewAddon("GladiatorlosSA", "AceEvent-3.0","AceConsole-3.0","AceTimer-3.0")
+GladiatorlosSA = LibStub("AceAddon-3.0"):NewAddon("GladiatorlosSA2", "AceEvent-3.0", "AceConsole-3.0", "AceTimer-3.0")
 
- local AceConfigDialog = LibStub("AceConfigDialog-3.0")
- local AceConfig = LibStub("AceConfig-3.0")
- local L = LibStub("AceLocale-3.0"):GetLocale("GladiatorlosSA")
- local LSM = LibStub("LibSharedMedia-3.0")
- local self, GSA, PlaySoundFile = GladiatorlosSA, GladiatorlosSA, PlaySoundFile
- local GSA_VERSION = C_AddOns.GetAddOnMetadata("GladiatorlosSA2", "Version")
- local GSA_GAME_VERSION = "11.0.5"
- local GSA_EXPANSION = ""
- local gsadb
- local soundz,sourcetype,sourceuid,desttype,destuid = {},{},{},{},{}
- local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
- local canSpeakHere = false
- local playerCurrentZone = ""
- local opponentName = ""
- local duelingOn = false
+local AceConfigDialog = LibStub("AceConfigDialog-3.0")
+local AceConfig = LibStub("AceConfig-3.0")
+local L = LibStub("AceLocale-3.0"):GetLocale("GladiatorlosSA")
+local LSM = LibStub("LibSharedMedia-3.0")
 
- -- This project is FULL of legacy code from before I took over. It's kind of a mess.
+local self, GSA, PlaySoundFile = GladiatorlosSA, GladiatorlosSA, PlaySoundFile
 
- local LSM_GSA_SOUNDFILES = {
+local ADDON_NAME = "GladiatorlosSA2" -- must match the .toc filename (without .toc)
+local GSA_VERSION = GetAddonMeta(ADDON_NAME, "Version") or "?"
+local GSA_GAME_VERSION = GetBuildInfo()  -- version string
+local GSA_EXPANSION = ""
+
+==========================
+==Anniversary TBC Wrapper
+==========================
+local function GetAddonMeta(addonName, field)
+    if C_AddOns and C_AddOns.GetAddOnMetadata then
+        return C_AddOns.GetAddOnMetadata(addonName, field)
+    end
+    if _G.GetAddOnMetadata then
+        return _G.GetAddOnMetadata(addonName, field)
+    end
+    return nil
+end
+
+local gsadb
+local soundz,sourcetype,sourceuid,desttype,destuid = {},{},{},{},{}
+local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
+local canSpeakHere = false
+local playerCurrentZone = ""
+local opponentName = ""
+local duelingOn = false
+
+-- This project is FULL of legacy code from before I took over. It's kind of a mess.
+
+local LSM_GSA_SOUNDFILES = {
 	["GSA-Demo"] = "Interface\\AddOns\\GladiatorlosSA2\\Voice_Custom\\Will-Demo.ogg",
- }
+}
 
- local GSA_LOCALEPATH = {
+local GSA_LOCALEPATH = {
 	enUS = "GladiatorlosSA2\\Voice_enUS",
- }
- self.GSA_LOCALEPATH = GSA_LOCALEPATH
+}
+self.GSA_LOCALEPATH = GSA_LOCALEPATH
 
- local GSA_LANGUAGE = {
+local GSA_LANGUAGE = {
 	["GladiatorlosSA2\\Voice_enUS"] = L["English(female)"],
- }
- self.GSA_LANGUAGE = GSA_LANGUAGE
+}
+self.GSA_LANGUAGE = GSA_LANGUAGE
 
- local GSA_EVENT = {
+local GSA_EVENT = {
 	SPELL_CAST_SUCCESS = L["Spell_CastSuccess"],
 	SPELL_CAST_START = L["Spell_CastStart"],
 	SPELL_AURA_APPLIED = L["Spell_AuraApplied"],
@@ -42,10 +59,10 @@
 	SPELL_EMPOWER_START = L["Spell_EmpowerStart"],
 	UNIT_DIED = L["Unit_Died"],
 	--UNIT_AURA = "Unit aura changed",
- }
- self.GSA_EVENT = GSA_EVENT
+}
+self.GSA_EVENT = GSA_EVENT
 
- local GSA_UNIT = {
+local GSA_UNIT = {
 	any = L["Any"],
 	player = L["Player"],
 	target = L["Target"],
@@ -56,10 +73,10 @@
 	--arena = L["Arena"],
 	--boss = L["Boss"],
 	custom = L["Custom"], 
- }
- self.GSA_UNIT = GSA_UNIT
+}
+self.GSA_UNIT = GSA_UNIT
 
- local GSA_TYPE = {
+local GSA_TYPE = {
 	[COMBATLOG_FILTER_EVERYTHING] = L["Any"],
 	[COMBATLOG_FILTER_FRIENDLY_UNITS] = L["Friendly"],
 	[COMBATLOG_FILTER_HOSTILE_PLAYERS] = L["Hostile player"],
@@ -69,11 +86,11 @@
 	[COMBATLOG_FILTER_MINE] = L["Mine"],
 	[COMBATLOG_FILTER_MY_PET] = L["My pet"],
 	[COMBATLOG_FILTER_UNKNOWN_UNITS] = "Unknown unit",
- }
- self.GSA_TYPE = GSA_TYPE
+}
+self.GSA_TYPE = GSA_TYPE
 
  -- TODO Clean up these arrays
- local TrackedFriendlyDebuffs = {
+local TrackedFriendlyDebuffs = {
 	 87204, 	-- Vampiric Touch Horrify
 	 196364, 	-- Unstable Affliction Silence
 	 1330, 		-- Garrote Silence
@@ -139,18 +156,18 @@
 	 360806, -- Sleepwalk
 	 389794, -- Snowdrift
 	 117526, -- Binding Shot (Stun)
- }
+}
 
- local EpicBGs = {
+local EpicBGs = {
 	2118,	-- Wintergrasp [Epic]
 	30,		-- Alterac Valley
 	628,	-- Isle of Conquest
 	1280,	-- Southshore vs Tarren Mill
 	1191,	-- Ashran
 	2197	-- Korrak's Revenge
- }
+}
 
- local alwaysExcludedMaps = {
+local alwaysExcludedMaps = {
 	-- Time Rifts
 	2586,	-- Azmerloth
 	2587,	-- A.Z.E.R.O.T.H.
@@ -160,9 +177,9 @@
 	2634,	-- The Warlands
 	2635,	-- Ulderoth
 	2639	-- Azmourne
- }
+}
 
- local dbDefaults = {
+local dbDefaults = {
 	profile = {
 		all = false,
 		arena = true,
@@ -198,30 +215,30 @@
 		
 		custom = {},
 	}	
- }
+}
 
- GSA.log = function(msg) DEFAULT_CHAT_FRAME:AddMessage("|cFF33FF22GladiatorlosSA|r: "..msg) end
+GSA.log = function(msg) DEFAULT_CHAT_FRAME:AddMessage("|cFF33FF22GladiatorlosSA|r: "..msg) end
 
- -- LSM BEGIN / inspired from MSBTMedia.lua
- local function RegisterSound(soundName, soundPath)
+-- LSM BEGIN / inspired from MSBTMedia.lua
+local function RegisterSound(soundName, soundPath)
 	if (type(soundName) ~= "string" or type(soundPath) ~= "string") then return end
 	if (soundName == "" or soundPath == "") then return end
 
 	soundz[soundName] = soundPath
 	LSM:Register("sound", soundName, soundPath)
- end
+end
 
- for soundName, soundPath in pairs(LSM_GSA_SOUNDFILES) do RegisterSound(soundName, soundPath) end
- for index, soundName in pairs(LSM:List("sound")) do soundz[soundName] = LSM:Fetch("sound", soundName) end
+for soundName, soundPath in pairs(LSM_GSA_SOUNDFILES) do RegisterSound(soundName, soundPath) end
+for index, soundName in pairs(LSM:List("sound")) do soundz[soundName] = LSM:Fetch("sound", soundName) end
 
- local function LSMRegistered(event, mediaType, name)
+local function LSMRegistered(event, mediaType, name)
 	if (mediaType == "sound") then
 		soundz[name] = LSM:Fetch(mediaType, name)
 	end
- end
- -- LSM END
+end
+-- LSM END
 
- function GladiatorlosSA:OnInitialize()
+function GladiatorlosSA:OnInitialize()
 	self:SetExpansion()
 
 	for _,v in pairs(self.spellList) do
@@ -286,10 +303,17 @@
 	LibStub("AceConfig-3.0"):RegisterOptionsTable("GladiatorlosSA_bliz", bliz_options)
 	AceConfigDialog:AddToBlizOptions("GladiatorlosSA_bliz", "GladiatorlosSA")
 	LSM.RegisterCallback(LSM_GSA_SOUNDFILES, "LibSharedMedia_Registered", LSMRegistered)
-	self:OnOptionCreate()
- end
+	if GSA_EXPANSION == L["EXPAC_TBC"] and self.OnOptionCreate_TBC then
+    		self:OnOptionCreate_TBC()
+	elseif GSA_EXPANSION == L["EXPAC_WotLK"] and self.OnOptionCreate_WLK then
+    		self:OnOptionCreate_WLK()
+	elseif self.OnOptionCreate then
+    		self:OnOptionCreate()
+    	end
+end
 
- function GladiatorlosSA:OnEnable()
+function GladiatorlosSA:OnEnable()
+	DEFAULT_CHAT_FRAME:AddMessage("|cff33ff99GSA2|r OnEnable fired ("..tostring(GSA_EXPANSION)..")")
 	GladiatorlosSA:RegisterEvent("PLAYER_ENTERING_WORLD")
 	GladiatorlosSA:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	GladiatorlosSA:RegisterEvent("UNIT_AURA")
@@ -299,32 +323,32 @@
 	if not GSA_LANGUAGE[gsadb.path] then gsadb.path = GSA_LOCALEPATH[GetLocale()] end
 	self.throttled = {}
 	self.smarter = 0
- end
+end
 
- function GladiatorlosSA:OnDisable()
+function GladiatorlosSA:OnDisable()
 	-- why is this here
- end
+end
 
 -- play sound by file name
- function GSA:PlaySound(fileName)
+function GSA:PlaySound(fileName)
 	 PlaySoundFile("Interface\\Addons\\" ..gsadb.path.. "\\"..fileName .. ".ogg", gsadb.output_menu)
- end
+end
 
- function GladiatorlosSA:ArenaClass(id)
+function GladiatorlosSA:ArenaClass(id)
 	for i = 1 , 5 do
 		if id == UnitGUID("arena"..i) then
 			return select(2, UnitClass ("arena"..i))
 		end
 	end
- end
+end
 
- function GladiatorlosSA:PLAYER_ENTERING_WORLD()
+function GladiatorlosSA:PLAYER_ENTERING_WORLD()
 	--CombatLogClearEntries()
 	 self:CanTalkHere()
- end
+end
 
 -- play sound by spell id and spell type
- function GladiatorlosSA:PlaySpell(listName, spellID, sourceGUID, destGUID, ...)
+function GladiatorlosSA:PlaySpell(listName, spellID, sourceGUID, destGUID, ...)
 	local list = self.spellList[listName]
 	if not list[spellID] then return end
 	if not gsadb[list[spellID]] then return	end
@@ -341,10 +365,10 @@
 
 		self:PlaySound(list[spellID])
 
- end
+end
 
- -- List of spells that need to be traked as Debuffs on ally players.
- function GSA:CheckFriendlyDebuffs(spellID)
+-- List of spells that need to be traked as Debuffs on ally players.
+function GSA:CheckFriendlyDebuffs(spellID)
 	 for k in pairs(TrackedFriendlyDebuffs) do
 		 if (TrackedFriendlyDebuffs[k] == spellID) then
 			 return true
@@ -352,7 +376,7 @@
 	 end
 end
 
- -- List of battlegrounds that are Epic Battlegrounds
+-- List of battlegrounds that are Epic Battlegrounds
 function GSA:CheckForEpicBG(instanceMapID)
 	for k in pairs(EpicBGs) do
 		if (EpicBGs[k] == instanceMapID) then
@@ -403,15 +427,15 @@ function GSA:CanTalkHere()
 	--print("CanTalkHere() = " .. tostring(canSpeakHere))
 end
 
- function GSA:SpammyDebug()
+function GSA:SpammyDebug()
 	 -- This shouldn't be used 99.9% of the time.
 	 -- Legacy debug code that makes your chat log unusable, but I've had to use it a couple times so here it is!
 	 print(sourceName,sourceGUID,destName,destGUID,destFlags,"|cffFF7D0A" .. event.. "|r",spellName,"|cffFF7D0A" .. spellID.. "|r")
 	 print("|cffff0000timestamp|r",timestamp,"|cffff0000event|r",event,"|cffff0000hideCaster|r",hideCaster,"|cffff0000sourceGUID|r",sourceGUID,"|cffff0000sourceName|r",sourceName,"|cffff0000sourceFlags|r",sourceFlags,"|cffff0000sourceFlags2|r",sourceFlags2,"|cffff0000destGUID|r",destGUID,"|cffff0000destName|r",destName,"|cffff0000destFlags|r",destFlags,"|cffff0000destFlags2|r",destFlags2,"|cffff0000spellID|r",spellID,"|cffff0000spellName|r",spellName)
- end
+end
 	
 
- function GladiatorlosSA:COMBAT_LOG_EVENT_UNFILTERED(event , ...)
+function GladiatorlosSA:COMBAT_LOG_EVENT_UNFILTERED(event , ...)
 
 	--print(event)
 	 -- Checks if alerts should occur here.
@@ -553,10 +577,10 @@ end
 			 end
 		 end
 	 end
- end
+end
 
 -- play drinking in arena
- function GladiatorlosSA:UNIT_AURA(event,uid)
+function GladiatorlosSA:UNIT_AURA(event,uid)
  	local _,currentZoneType = IsInInstance()
 
 	--if gsadb.drinking then--if uid:find("arena") and gsadb.drinking then 
@@ -567,10 +591,10 @@ end
 			end
 		end
 	--end
- end
+end
 
 
- function GladiatorlosSA:Throttle(key,throttle)
+function GladiatorlosSA:Throttle(key,throttle)
 	if (not self.throttled) then
 		self.throttled = {}
 	end
@@ -584,33 +608,33 @@ end
 	else
 		return true
 	end
- end
+end
 
- -- A player has requested to duel me
- --[[
+-- A player has requested to duel me
+--[[
 function GladiatorlosSA:DUEL_REQUESTED(event, playerName)
 	opponentName = playerName
 	duelingOn = true
- end
+end
  
- --I requested a duel to my target
- function GladiatorlosSA:CHAT_MSG_SYSTEM(event, text)
+--I requested a duel to my target
+function GladiatorlosSA:CHAT_MSG_SYSTEM(event, text)
 	if string.find(text, _G.ERR_DUEL_REQUESTED ) then
 		if (UnitExists("target")) then
 			duelingOn = true
 			opponentName = UnitName("target")
 		end
 	end
- end
+end
  
-  -- The duel finished or was canceled
-  function GladiatorlosSA:DUEL_FINISHED(event)
+ -- The duel finished or was canceled
+ function GladiatorlosSA:DUEL_FINISHED(event)
 	opponentName = ""
 	duelingOn = false
-  end
-  ]]
+end
+]]
 
- function GladiatorlosSA:SetExpansion()
+function GladiatorlosSA:SetExpansion()
 	 local _,_,_,interfaceNumber = GetBuildInfo()
 
 	 if not self.spellList then
@@ -637,4 +661,4 @@ function GladiatorlosSA:DUEL_REQUESTED(event, playerName)
 
 
 
- end
+end
