@@ -5,6 +5,16 @@ local AceConfig = LibStub("AceConfig-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("GladiatorlosSA")
 local LSM = LibStub("LibSharedMedia-3.0")
 local options_created = false -- ***** @
+local function GetAddonMeta(addonName, field)
+    if C_AddOns and C_AddOns.GetAddOnMetadata then
+        return C_AddOns.GetAddOnMetadata(addonName, field)
+    end
+    if _G.GetAddOnMetadata then
+        return _G.GetAddOnMetadata(addonName, field)
+    end
+    return nil
+end
+local ADDON_NAME = "GladiatorlosSA2"
 
 local GSA_OUTPUT = {["MASTER"] = L["Master"],["SFX"] = L["SFX"],["AMBIENCE"] = L["Ambience"],["MUSIC"] = L["Music"],["DIALOG"] = L["Dialog"]}
 
@@ -103,7 +113,7 @@ function GladiatorlosSA:OnOptionCreate_TBC()
 	options_created = true -- ***** @
 	self.options = {
 		type = "group",
-		name = GetAddOnMetadata("GladiatorlosSA", "Title"),
+		name = GetAddonMeta(ADDON_NAME, "Title") or "GladiatorlosSA2",
 		args = {
 			general = {
 				type = 'group',
