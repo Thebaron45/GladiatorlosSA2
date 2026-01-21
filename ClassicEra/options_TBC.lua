@@ -3,6 +3,31 @@ local gsadb
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 local AceConfig = LibStub("AceConfig-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("GladiatorlosSA")
+if type(L) == "table" then
+    L["epicbattleground"] = "Alterac Valley"
+    L["epicbattlegroundDesc"] = "Enable alerts in Alterac Valley."
+end
+-- TBC clarification: "Epic Battlegrounds" == Alterac Valley
+local loc = GetLocale()
+if loc == "enUS" or loc == "enGB" then
+    L["epicbattleground"] = "Alterac Valley"
+    L["epicbattlegroundDesc"] = "Enable alerts in Alterac Valley."
+elseif loc == "frFR" then
+    L["epicbattleground"] = "Vallée d’Alterac"
+    L["epicbattlegroundDesc"] = "Activer les alertes dans la vallée d’Alterac."
+elseif loc == "koKR" then
+    L["epicbattleground"] = "알터랙 계곡"
+    L["epicbattlegroundDesc"] = "알터랙 계곡에서 알림을 활성화합니다."
+elseif loc == "ruRU" then
+    L["epicbattleground"] = "Альтеракская долина"
+    L["epicbattlegroundDesc"] = "Включить оповещения в Альтеракской долине."
+elseif loc == "zhCN" then
+    L["epicbattleground"] = "奥特兰克山谷"
+    L["epicbattlegroundDesc"] = "在奥特兰克山谷中启用警报。"
+elseif loc == "zhTW" then
+    L["epicbattleground"] = "奧特蘭克山谷"
+    L["epicbattlegroundDesc"] = "在奧特蘭克山谷中啟用警報。"
+end
 local LSM = LibStub("LibSharedMedia-3.0")
 local options_created = false -- ***** @
 local function GetAddonMeta(addonName, field)
