@@ -4,14 +4,6 @@ local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 local AceConfig = LibStub("AceConfig-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("GladiatorlosSA")
 local LSM = LibStub("LibSharedMedia-3.0")
-
-local self, GSA, PlaySoundFile = GladiatorlosSA, GladiatorlosSA, PlaySoundFile
-
-local ADDON_NAME = "GladiatorlosSA2" -- must match the .toc filename (without .toc)
-local GSA_VERSION = GetAddonMeta(ADDON_NAME, "Version") or "?"
-local GSA_GAME_VERSION = GetBuildInfo()  -- version string
-local GSA_EXPANSION = ""
-
 ----------------------------
 --Anniversary TBC Wrapper
 ----------------------------
@@ -24,6 +16,12 @@ local function GetAddonMeta(addonName, field)
     end
     return nil
 end
+local self, GSA, PlaySoundFile = GladiatorlosSA, GladiatorlosSA, PlaySoundFile
+
+local ADDON_NAME = "GladiatorlosSA2" -- must match the .toc filename (without .toc)
+local GSA_VERSION = GetAddonMeta(ADDON_NAME, "Version") or "?"
+local GSA_GAME_VERSION = GetBuildInfo()  -- version string
+local GSA_EXPANSION = ""
 
 local gsadb
 local soundz,sourcetype,sourceuid,desttype,destuid = {},{},{},{},{}
