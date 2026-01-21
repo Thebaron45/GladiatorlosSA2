@@ -25,6 +25,147 @@ function GSA:ShowConfig()
 end
 ]]
 
+-- TBC port: Retail code expects MakeCustomOption to exist; TBC options file didn't include it.
+function GSA:MakeCustomOption(key)
+    -- options table must already be created by OnOptionCreate_TBC
+    if not (self.options and self.options.args and self.options.args.custom and self.options.args.custom.args) then
+        return
+    end
+
+    -- gsadb is set in OnOptionCreate_TBC(): gsadb = self.db1.profile
+    local dbroot = gsadb or (self.db1 and self.db1.profile)
+    if not (dbroot and dbroot.custom) then
+        return
+    end
+
+    local options = self.options.args.custom.args
+    local db = dbroot.custom
+
+    options[key] = {
+        type = 'group',
+        name = function() return db[key].name end,
+        set = function(info, value) local name = info[#info] db[key][name] = value end,
+        get = function(info) local name = info[#info] return db[key][name] end,
+        order = db[key].order,
+        args = {
+            name = {
+                name = L["name"],
+                type = 'input',
+                set = function(info, value)
+                    if db[value] then GSA.log(L["same name already exists"]) return end
+                    db[value] = db[key]
+                    db[value].name = value
+                    db[value].order = #db + 1
+                    db[value].soundfilepath = "Interface\\AddOns\\GladiatorlosSA2\\Voice_Custom\\"..value..".ogg"
+                    db[key] = nil
+                    options[value] = options[key]
+                    options[key] = nil
+                    key = value
+                end,
+                order = 10,
+            },
+            spellid = {
+                name = L["spellid"],
+                type = 'input',
+                order = 20,
+                pattern = "%d+$",
+            },
+            remove = {
+                type = 'execute',
+                order = 25,
+                name = L["Remove"],
+                confirm = true,
+                confirmText = L["Are you sure?"],
+                func = function()
+                    db[key] = nil
+                    options[key] = nil
+                end,
+            },
+            existingsound = {
+                name = L["Use existing sound"],
+                type = 'toggle',
+                order = 41,
+            },
+            soundfilepath = {
+                name = L["file path"],
+                type = 'input',
+                width = 'double',
+                order = 26,
+                disabled = function() return db[key].existingsound end,
+            },
+            test = {
+                type = 'execute',
+                order = 28,
+                name = L["Test"],
+                disabled = function() return db[key].existingsound end,
+                func = function() PlaySoundFile(db[key].soundfilepath, "Master") end,
+            },
+            NewLinetest = {
+                type= 'description',
+                order = 29,
+                name= '',
+            },
+            existinglist = {
+                name = L["choose a sound"],
+                type = 'select',
+                dialogControl = 'LSM30_Sound',
+                values =  LSM:HashTable("sound"),
+                disabled = function() return not db[key].existingsound end,
+                order = 40,
+            },
+            NewLine3 = {
+                type= 'description',
+                order = 45,
+                name= '',
+            },
+            eventtype = {
+                type = 'multiselect',
+                order = 50,
+                name = L["event type"],
+                values = self.GSA_EVENT,
+                get = function(info, k) return db[key].eventtype[k] end,
+                set = function(info, k, v) db[key].eventtype[k] = v end,
+            },
+            sourcetypefilter = {
+                type = 'select',
+                order = 59,
+                name = L["Source type"],
+                values = self.GSA_TYPE,
+            },
+            desttypefilter = {
+                type = 'select',
+                order = 60,
+                name = L["Dest type"],
+                values = self.GSA_TYPE,
+            },
+            sourceuidfilter = {
+                type = 'select',
+                order = 61,
+                name = L["Source unit"],
+                values = self.GSA_UNIT,
+            },
+            sourcecustomname = {
+                type= 'input',
+                order = 62,
+                name= L["Custom unit name"],
+                disabled = function() return not (db[key].sourceuidfilter == "custom") end,
+            },
+            destuidfilter = {
+                type = 'select',
+                order = 65,
+                name = L["Dest unit"],
+                values = self.GSA_UNIT,
+            },
+            destcustomname = {
+                type= 'input',
+                order = 68,
+                name = L["Custom unit name"],
+                disabled = function() return not (db[key].destuidfilter == "custom") end,
+            },
+        }
+    }
+end
+
 function GSA:ShowConfig2() -- ***** @
 	if options_created == false then
 		if (GSA_EXPANSION == L["EXPAC_SL"]) then
