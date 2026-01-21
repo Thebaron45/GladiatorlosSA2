@@ -12,9 +12,9 @@ local GSA_VERSION = GetAddonMeta(ADDON_NAME, "Version") or "?"
 local GSA_GAME_VERSION = GetBuildInfo()  -- version string
 local GSA_EXPANSION = ""
 
-==========================
-==Anniversary TBC Wrapper
-==========================
+----------------------------
+--Anniversary TBC Wrapper
+----------------------------
 local function GetAddonMeta(addonName, field)
     if C_AddOns and C_AddOns.GetAddOnMetadata then
         return C_AddOns.GetAddOnMetadata(addonName, field)
