@@ -311,7 +311,6 @@ function GladiatorlosSA:OnInitialize()
 end
 
 function GladiatorlosSA:OnEnable()
-	DEFAULT_CHAT_FRAME:AddMessage("|cff33ff99GSA2|r OnEnable fired ("..tostring(GSA_EXPANSION)..")")
 	GladiatorlosSA:RegisterEvent("PLAYER_ENTERING_WORLD")
 	GladiatorlosSA:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	GladiatorlosSA:RegisterEvent("UNIT_AURA")
@@ -656,7 +655,4 @@ function GladiatorlosSA:SetExpansion()
 			self.spellList = self:GetSpellList()
 		end
 	end
-
-
-
 end
