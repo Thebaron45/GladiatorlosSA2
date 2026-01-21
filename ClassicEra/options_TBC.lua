@@ -3,30 +3,38 @@ local gsadb
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 local AceConfig = LibStub("AceConfig-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("GladiatorlosSA")
-if type(L) == "table" then
-    L["epicbattleground"] = "Alterac Valley"
-    L["epicbattlegroundDesc"] = "Enable alerts in Alterac Valley."
-end
--- TBC clarification: "Epic Battlegrounds" == Alterac Valley
+-- TBC-specific wording corrections for Enabled Locations
 local loc = GetLocale()
 if loc == "enUS" or loc == "enGB" then
+    L["arenaDesc"] = "Alerts occur in arenas."
     L["epicbattleground"] = "Alterac Valley"
-    L["epicbattlegroundDesc"] = "Enable alerts in Alterac Valley."
+    L["epicbattlegroundDesc"] = "Alerts occur in Alterac Valley."
+    L["worldDesc"] = "Alerts occur in the world, such as Kalimdor, Eastern Kingdoms, or Outland."
 elseif loc == "frFR" then
+    L["arenaDesc"] = "Les alertes se produisent en arène."
     L["epicbattleground"] = "Vallée d’Alterac"
-    L["epicbattlegroundDesc"] = "Activer les alertes dans la vallée d’Alterac."
+    L["epicbattlegroundDesc"] = "Les alertes se produisent dans la vallée d’Alterac."
+    L["worldDesc"] = "Les alertes se produisent dans le monde, comme Kalimdor, les Royaumes de l’Est ou l’Outreterre."
 elseif loc == "koKR" then
+    L["arenaDesc"] = "투기장에서 알림이 발생합니다."
     L["epicbattleground"] = "알터랙 계곡"
-    L["epicbattlegroundDesc"] = "알터랙 계곡에서 알림을 활성화합니다."
+    L["epicbattlegroundDesc"] = "알터랙 계곡에서 알림이 발생합니다."
+    L["worldDesc"] = "칼림도어, 동부 왕국 또는 아웃랜드와 같은 야외 지역에서 알림이 발생합니다."
 elseif loc == "ruRU" then
+    L["arenaDesc"] = "Оповещения работают на аренах."
     L["epicbattleground"] = "Альтеракская долина"
-    L["epicbattlegroundDesc"] = "Включить оповещения в Альтеракской долине."
+    L["epicbattlegroundDesc"] = "Оповещения работают в Альтеракской долине."
+    L["worldDesc"] = "Оповещения работают в мире, например в Калимдоре, Восточных королевствах или Запределье."
 elseif loc == "zhCN" then
+    L["arenaDesc"] = "在竞技场中触发警报。"
     L["epicbattleground"] = "奥特兰克山谷"
-    L["epicbattlegroundDesc"] = "在奥特兰克山谷中启用警报。"
+    L["epicbattlegroundDesc"] = "在奥特兰克山谷中触发警报。"
+    L["worldDesc"] = "在卡利姆多、东部王国或外域等世界区域中触发警报。"
 elseif loc == "zhTW" then
+    L["arenaDesc"] = "在競技場中觸發警報。"
     L["epicbattleground"] = "奧特蘭克山谷"
-    L["epicbattlegroundDesc"] = "在奧特蘭克山谷中啟用警報。"
+    L["epicbattlegroundDesc"] = "在奧特蘭克山谷中觸發警報。"
+    L["worldDesc"] = "在卡林多、東部王國或外域等世界區域中觸發警報。"
 end
 local LSM = LibStub("LibSharedMedia-3.0")
 local options_created = false -- ***** @
