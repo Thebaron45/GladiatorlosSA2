@@ -4,7 +4,7 @@
 ## Author: Mulvark
 ## IconTexture: interface\icons\spell_misc_emotionangry.blp
 ## SavedVariables: GladiatorlosSADB
-## Version: 5.0.1-tbc
+## Version: 5.0.3-tbc
 
 embeds.xml
 Locales\locales.xml
