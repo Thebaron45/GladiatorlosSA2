@@ -282,7 +282,7 @@ local function listOption(spellList, listType, ...)
 end
 
 function GladiatorlosSA:OnOptionCreate_TBC()
-	print("Loading TBC")
+	--print("Loading TBC")
 	gsadb = self.db1.profile
 	options_created = true -- ***** @
 	self.options = {
